@@ -189,50 +189,6 @@ export default function Connect({
     updateState();
   }, [connections]);
 
-  // useEffect(() => {
-  //   const poll = async () => {
-  //     // Your polling logic here
-  //     const data = await fetchConnections(token);
-  //     console.log(connectionState, cursor);
-  //     switch (connectionState) {
-  //       case "INITIAL":
-  //         console.log("Setting cursor", data.connections.pageInfo.endCursor)
-  //         setCursor(data.connections.pageInfo.endCursor);
-  //         setConnectionState("WAIT_PW");
-  //         //setTimeout(poll, 1000);
-  //         break;
-  //       case "WAIT_PW":
-  //         if (data.connections.pageInfo.endCursor !== cursor) {
-  //           const len = data.connections.edges.length;
-  //           setPwConnectionId(data.connections.edges[len - 1].node.id);
-  //           localStorage.setItem(name + "_pwId", pwConnectionId);
-  //           setCursor(data.connections.pageInfo.endCursor);
-  //           const botInvitation = await fetchBotInvitation();
-  //           await connect(token, botInvitation);
-  //           setConnectionState("WAIT_BOT");
-  //           setTimeout(poll, 1000);
-  //         }
-  //         break;
-  //       case "WAIT_BOT":
-  //         if (data.connections.pageInfo.endCursor !== cursor) {
-  //           const len = data.connections.edges.length;
-  //           setBotConnectionId(data.connections.edges[len - 1].node.id);
-  //           localStorage.setItem(name + "_botId", botConnectionId);
-  //           setCursor(data.connections.pageInfo.endCursor);
-  //         }
-  //         break;
-  //     }
-  //   };
-
-  //   if (!pollingStarted) {
-  //     setPollingStarted(true);
-  //     poll();
-  //   }
-
-  //   return () => {
-  //   };
-  // }, []);
-
   const doConnect = async () => {
     await connect(token, invitation);
   };
