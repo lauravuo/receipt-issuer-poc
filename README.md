@@ -6,6 +6,8 @@ Sample for utilizing receipt-issuer bot in Findy Agency Vault API based app.
 
 1. **Prepare bot**
 
+    See full documentation and original source code for the bot [here](https://github.com/findy-network/findy-agent-cli/blob/master/scripts/fullstack/fsm/README.md).
+
    1. Define agency URL: `export AGENCY_URL="https://agency.example.com"`
    2. Initialize and start bot:
 
