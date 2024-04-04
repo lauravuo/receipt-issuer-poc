@@ -33,6 +33,24 @@ export default gql`
                 createdMs
                 updatedMs
                 output {
+                  credential {
+                    cursor
+                    node {
+                      id
+                      role
+                      schemaId
+                      credDefId
+                      attributes {
+                        id
+                        name
+                        value
+                      }
+                      initiatedByUs
+                      createdMs
+                      approvedMs
+                      issuedMs
+                    }
+                  }
                   message {
                     cursor
                     node {

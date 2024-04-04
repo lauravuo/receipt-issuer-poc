@@ -149,7 +149,7 @@ export default function Connect({
     const poll = async () => {
       setConnections(await fetchConnections(token));
     };
-    setIntervalId(setInterval(poll, 1000));
+    setIntervalId(setInterval(poll, 5000));
   }, []);
 
   useEffect(() => {
@@ -158,7 +158,6 @@ export default function Connect({
       const conns = connections.connections;
       switch (connectionState) {
         case "INITIAL":
-          console.log("Setting cursor", conns.pageInfo.endCursor);
           setCursor(conns.pageInfo.endCursor);
           setConnectionState("WAIT_PW");
           break;

@@ -94,55 +94,61 @@ const markRead = async (token: string, eventId: string) => {
   return data.markEventRead.id;
 };
 
-const chatComponent = (event: IEventEdge, me: Person, friend: Person) => (
-  <div>
-    {event.node.job?.node.output.message?.node.sentByMe ? (
-      <div
-        className="chat-message"
-        key={event.node.job?.node.output.message?.node.id}
-      >
-        <div className="flex items-end justify-end">
-          <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-            <div>
-              <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">
-                {event.node.job?.node.output.message?.node.message}
-              </span>
+const chatComponent = (event: IEventEdge, me: Person, friend: Person) => {
+  const content = event.node.job?.node.output.message?.node.message.includes(
+    "rcvr_arriwed",
+  )
+    ? "Receipt sent successfully"
+    : event.node.job?.node.output.message?.node.message;
+  return (
+    <div>
+      {event.node.job?.node.output.message?.node.sentByMe ? (
+        <div
+          className="chat-message"
+          key={event.node.job?.node.output.message?.node.id}
+        >
+          <div className="flex items-end justify-end">
+            <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
+              <div>
+                <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">
+                  {content}
+                </span>
+              </div>
             </div>
+            <img
+              src={me.img}
+              alt="My profile"
+              className="w-6 h-6 rounded-full order-2"
+            />
           </div>
-          <img
-            src={me.img}
-            alt="My profile"
-            className="w-6 h-6 rounded-full order-2"
-          />
         </div>
-      </div>
-    ) : (
-      <div
-        className="chat-message"
-        key={
-          event.node.job?.node.output.message?.node &&
-          event.node.job?.node.output.message?.node.id
-        }
-      >
-        <div className="flex items-end">
-          <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-            <div>
-              <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
-                {event.node.job?.node.output.message?.node &&
-                  event.node.job?.node.output.message?.node.message}
-              </span>
+      ) : (
+        <div
+          className="chat-message"
+          key={
+            event.node.job?.node.output.message?.node &&
+            event.node.job?.node.output.message?.node.id
+          }
+        >
+          <div className="flex items-end">
+            <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
+              <div>
+                <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
+                  {content}
+                </span>
+              </div>
             </div>
+            <img
+              src={friend.img}
+              alt="My profile"
+              className="w-6 h-6 rounded-full order-1"
+            />
           </div>
-          <img
-            src={friend.img}
-            alt="My profile"
-            className="w-6 h-6 rounded-full order-1"
-          />
         </div>
-      </div>
-    )}
-  </div>
-);
+      )}
+    </div>
+  );
+};
 export default function Chat({
   token,
   name,
@@ -181,7 +187,7 @@ export default function Chat({
       setEvents(await fetchEvents(token, connectionId));
       setBotEvents(await fetchEvents(token, botConnectionId));
     };
-    setInterval(poll, 2000);
+    setInterval(poll, 5000);
     poll();
   }, []);
 
@@ -215,14 +221,21 @@ export default function Chat({
 
   const messages = [...(events ? events : []), ...(botEvents ? botEvents : [])]
     ?.sort((a, b) =>
-      a.node.job.node.updatedMs < b.node.job.node.updatedMs ? -1 : 1,
+      (a.node.job?.node.updatedMs || 0) < (b.node.job?.node.updatedMs || 0)
+        ? -1
+        : 1,
     )
     .filter(
       (event) =>
-        (event.node.connection.id == connectionId &&
+        (event.node.connection?.id == connectionId &&
           event.node.job?.node.protocol === "BASIC_MESSAGE" &&
           event.node.job?.node.output.message?.node) ||
-        (event.node.connection.id == botConnectionId &&
+        (event.node.connection?.id == botConnectionId &&
+          event.node.job?.node.protocol === "BASIC_MESSAGE" &&
+          event.node.job?.node.output.message?.node.message.includes(
+            "rcvr_arriwed",
+          )) ||
+        (event.node.connection?.id == botConnectionId &&
           event.node.job?.node.protocol === "CREDENTIAL"),
     );
 
@@ -267,7 +280,26 @@ export default function Chat({
               {event.node.job?.node.output.message?.node ? (
                 chatComponent(event, me, friend)
               ) : (
-                <div>{event.node.description}</div>
+                <div className="p-10 bg-blue-200">
+                  <div>{event.node.description}</div>
+                  <div>
+                    {event.node.job?.node.output.credential?.node.credDefId}
+                  </div>
+                  <div>
+                    {event.node.job?.node.output.credential?.node.schemaId}
+                  </div>
+                  <div>
+                    {event.node.job?.node.output.credential?.node.attributes.map(
+                      (attr) => (
+                        <div key={attr.id}>
+                          <span>
+                            {attr.name}:{attr.value}
+                          </span>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           ))}
@@ -295,6 +327,7 @@ export default function Chat({
         <div className="relative flex">
           <input
             type="text"
+            value={message}
             placeholder="Write your message!"
             className="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-12 bg-gray-200 rounded-md py-3"
             onChange={(e) => setMessage(e.target.value)}

@@ -93,4 +93,7 @@ fi
 pub_url="$AGENCY_URL/dyn?did=$did&label=issuer-bot&url=yes"
 echo "Fetch bot invitation from $pub_url"
 
+# make sure all the needed env variables are set
+source .envrc
+
 findy-agent-cli bot start --service-fsm issuing-service-b-fsm.yaml issuing-service-f-fsm.yaml -v=1
