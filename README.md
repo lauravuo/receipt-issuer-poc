@@ -73,11 +73,13 @@ Sample for utilizing receipt-issuer bot in Findy Agency Vault API based app.
 - **Issuing**: The seller's agent sends [the commands](https://github.com/lauravuo/receipt-issuer-poc/blob/3dca42ac7a14224626209073dccc57da18a4724f/src/components/Chat.tsx#L172)
   to bot for issuing the credential. In addition, it sends the bot session id to the buyer's agent.
   When buyer receives the session id, it can send the commands to the bot for receiving the credential.
-- After this the credential accepting can proceed normally,
+  After this the credential accepting can proceed normally,
   like it would work if the seller's agent itself would have issued the credential.
 
 ## Summary
 
 In this sample app, the seller's agent is issuing a credential using the issuer bot agent.
+Both of the buyer and seller have dedicated connections to the bot agent.
 In the UX level, the chat view is showing the needed events
 from both the buyer's and seller's connection, and the bot connection.
+However, the existance of the bot connection is not visible in the UI.
